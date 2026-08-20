@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerador de Nomenclatura - Grupo Meghelli</title>
+<style>
+:root{
+ --navy:#12395f; --navy2:#0b2d4b; --bg:#f4f6f8; --card:#ffffff;
+ --text:#1c2731; --muted:#697681; --line:#d7dee5; --soft:#edf2f5;
+ --teal:#0aa7b5; --green:#0d8b5f; --warn:#fff7df;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:var(--text)}
+.wrap{max-width:1120px;margin:28px auto;padding:0 18px 42px}
+.hero{background:linear-gradient(135deg,var(--navy2),var(--navy));color:#fff;padding:28px 30px;border-radius:16px;margin-bottom:18px}
+.hero h1{margin:0 0 7px;font-size:29px}
+.hero p{margin:0;opacity:.9;line-height:1.5}
+.card{background:var(--card);border-radius:14px;padding:24px;margin-bottom:18px;box-shadow:0 3px 16px rgba(0,0,0,.07)}
+.title{font-size:18px;font-weight:700;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+.field small{display:block;margin-top:5px;color:var(--muted);font-size:12px;line-height:1.45}
+select,input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:14px;color:var(--text)}
+.hidden{display:none!important}
+.pattern{font-family:Consolas,monospace;font-weight:700;background:var(--soft);padding:12px 14px;border-radius:8px;margin-bottom:16px}
+.result{font-family:Consolas,monospace;font-size:21px;font-weight:700;background:#edf1f4;border:1px solid var(--line);padding:18px;border-radius:10px;word-break:break-word}
+.explain{margin-top:14px;line-height:1.75;font-size:14px;color:#4d5a65}
+button{margin-top:12px;border:0;background:var(--navy);color:#fff;padding:12px 17px;border-radius:8px;font-weight:700;cursor:pointer}
+button:hover{background:var(--navy2)}
+.badge{font-size:12px;background:#dff4f6;color:#08737c;padding:4px 8px;border-radius:999px;margin-left:6px}
+.note{background:var(--warn);border-left:4px solid #d2a229;border-radius:8px;padding:12px 14px;font-size:13px;line-height:1.55;color:#5c512f}
+.inc-note{background:#eef9f5;border-left:4px solid var(--green);border-radius:8px;padding:12px 14px;font-size:13px;line-height:1.55;color:#315f50;margin-top:14px}
+@media(max-width:720px){.grid{grid-template-columns:1fr}.hero h1{font-size:23px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <h1>Gerador de Nomenclatura Documental</h1>
+  <p>Baseado na Matriz Mestra de Siglas atualizada – incluindo Incorporação.</p>
+</div>
+
+<div class="card">
+  <div class="title">1. Selecione a área</div>
+  <div class="grid">
+    <div class="field">
+      <label>Área / Aplicação</label>
+      <select id="area">
+        <option value="PRO">PRO – Projetos</option>
+        <option value="ENG">ENG – Engenharia</option>
+        <option value="INC">INC – Incorporação</option>
+        <option value="QUA">QUA – Qualidade</option>
+        <option value="RH">RH – Recursos Humanos</option>
+        <option value="SUP">SUP – Suprimentos</option>
+      </select>
+    </div>
+
+    <div id="supModeWrap" class="field hidden">
+      <label>Tipo de documento de Suprimentos</label>
+      <select id="supMode">
+        <option value="NORM">Documento normativo / SGQ</option>
+        <option value="EMP">Documento relacionado ao empreendimento</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="title">2. Preencha os campos</div>
+  <div id="pattern" class="pattern"></div>
+
+  <div class="grid">
+
+    <div id="empWrap" class="field hidden">
+      <label>EMP – Empreendimento</label>
+      <select id="emp">
+        <option value="ITA">ITA – Edifício Itacolomi</option>
+        <option value="RSE">RSE – Raízes de Severínia</option>
+        <option value="CBE">CBE – Cidade de Belém</option>
+        <option value="CSJ">CSJ – Chácara São João</option>
+        <option value="HDM">HDM – Horta do Manduca</option>
+      </select>
+    </div>
+
+    <!-- PROJETOS -->
+    <div id="disWrap" class="field hidden">
+      <label>DIS – Disciplina</label>
+      <select id="dis">
+        <option value="AMB">AMB – Ambiental</option>
+        <option value="ARQ" selected>ARQ – Arquitetura</option>
+        <option value="CLI">CLI – Climatização</option>
+        <option value="COO">COO – Coordenação</option>
+        <option value="DOC">DOC – Documentação</option>
+        <option value="DRE">DRE – Drenagem</option>
+        <option value="ELE">ELE – Elétrica</option>
+        <option value="ESG">ESG – Esgoto</option>
+        <option value="EST">EST – Estrutura</option>
+        <option value="FUN">FUN – Fundação</option>
+        <option value="HID">HID – Hidrossanitária</option>
+        <option value="IMP">IMP – Impermeabilização</option>
+        <option value="INC">INC – Incorporação</option>
+        <option value="INT">INT – Interiores</option>
+        <option value="LEV">LEV – Levantamento Topográfico</option>
+        <option value="PSG">PSG – Paisagismo</option>
+        <option value="QUA">QUA – Qualidade</option>
+        <option value="SON">SON – Sondagem</option>
+        <option value="TRP">TRP – Terraplanagem</option>
+        <option value="URB">URB – Urbanístico</option>
+      </select>
+    </div>
+
+    <div id="fasWrap" class="field hidden">
+      <label>FAS – Fase</label>
+      <select id="fas">
+        <option value="EP">EP – Estudo Preliminar</option>
+        <option value="AP">AP – Anteprojeto</option>
+        <option value="PL">PL – Projeto Legal</option>
+        <option value="EX">EX – Projeto Executivo</option>
+        <option value="LO">LO – Liberado Obra</option>
+        <option value="AB">AB – As Built</option>
+      </select>
+    </div>
+
+    <div id="projTipWrap" class="field hidden">
+      <label>TIP – Tipo Técnico / Conteúdo</label>
+      <select id="projTip">
+        <option value="GER">GER – Geral</option>
+        <option value="IMP">IMP – Implantação</option>
+        <option value="CRT">CRT – Cortes</option>
+        <option value="ELE">ELE – Elevação</option>
+        <option value="PAV">PAV – Pavimento</option>
+        <option value="SUB">SUB – Subsolo</option>
+        <option value="DIR">DIR – Diretrizes</option>
+        <option value="CTD">CTD – Certidão</option>
+        <option value="MMD">MMD – Memorial Descritivo</option>
+        <option value="PJR">PJR – Projeto de Retificação</option>
+        <option value="RET">RET – Retificação</option>
+        <option value="DMB">DMB – Desmembramento</option>
+        <option value="PES">PES – Pesquisa de Mercado</option>
+        <option value="ART">ART – Anotação de Responsabilidade Técnica</option>
+        <option value="REL">REL – Relatório</option>
+      </select>
+    </div>
+
+    <div id="folModeWrap" class="field hidden">
+      <label>FOL – Folha / Prancha</label>
+      <select id="folMode">
+        <option value="UNI">UNI – Documento / folha única</option>
+        <option value="NUM">Folha / prancha numerada</option>
+      </select>
+    </div>
+
+    <div id="folNumWrap" class="field hidden">
+      <label>Número da folha / prancha</label>
+      <input id="folNum" type="number" min="1" value="1">
+      <small>Formato automático: 001, 002, 003...</small>
+    </div>
+
+    <!-- ENGENHARIA -->
+    <div id="engTipWrap" class="field hidden">
+      <label>TIP – Tipo Técnico</label>
+      <select id="engTip">
+        <option value="ART">ART – Anotação de Responsabilidade Técnica</option>
+        <option value="REL">REL – Relatório</option>
+        <option value="RFO" selected>RFO – Relatório Fotográfico de Obra</option>
+        <option value="MED">MED – Medição</option>
+        <option value="LAU">LAU – Laudo</option>
+        <option value="DOB">DOB – Diário de Obra</option>
+      </select>
+    </div>
+
+    <div id="objWrap" class="field hidden">
+      <label>OBJ – Objeto / Localização</label>
+      <select id="obj">
+        <option value="GER">GER – Geral / Obra Geral</option>
+        <option value="FUN">FUN – Fundação</option>
+        <option value="EST">EST – Estrutura</option>
+        <option value="ALV">ALV – Alvenaria</option>
+        <option value="COB">COB – Cobertura</option>
+        <option value="FAC">FAC – Fachada</option>
+        <option value="PIN">PIN – Pintura</option>
+        <option value="ELE">ELE – Instalações Elétricas</option>
+        <option value="HID">HID – Instalações Hidrossanitárias</option>
+        <option value="IMP">IMP – Impermeabilização</option>
+        <option value="ACE">ACE – Acabamentos</option>
+        <option value="EXT">EXT – Área Externa</option>
+        <option value="APT">APT – Apartamento</option>
+        <option value="CAS">CAS – Casa</option>
+        <option value="BLQ">BLQ – Bloco</option>
+        <option value="ACO">ACO – Área Comum</option>
+        <option value="TER">TER – Térreo</option>
+        <option value="SUB">SUB – Subsolo</option>
+      </select>
+    </div>
+
+    <!-- INCORPORAÇÃO -->
+    <div id="incTipWrap" class="field hidden">
+      <label>TIP – Tipo de Incorporação</label>
+      <select id="incTip">
+        <option value="ALV">ALV – Alvará</option>
+        <option value="ART">ART – Anotação de Responsabilidade Técnica</option>
+        <option value="AVB">AVB – Averbação</option>
+        <option value="CND">CND – Certidão Negativa de Débitos</option>
+        <option value="CON">CON – Convenção de Condomínio</option>
+        <option value="CTD">CTD – Certidão</option>
+        <option value="DEC">DEC – Declaração</option>
+        <option value="FRA">FRA – Fração Ideal</option>
+        <option value="HAB">HAB – Habite-se</option>
+        <option value="INS">INS – Instituição de Condomínio</option>
+        <option value="MAT">MAT – Matrícula do Imóvel</option>
+        <option value="MIN">MIN – Minuta de Incorporação</option>
+        <option value="MMD">MMD – Memorial Descritivo</option>
+        <option value="PRO">PRO – Protocolo</option>
+        <option value="QNB">QNB – Quadro NBR 12.721</option>
+        <option value="RIN">RIN – Registro de Incorporação</option>
+        <option value="RRT">RRT – Registro de Responsabilidade Técnica</option>
+      </select>
+    </div>
+
+    <div id="incIdModeWrap" class="field hidden">
+      <label>ID – Tipo de Identificação</label>
+      <select id="incIdMode">
+        <option value="SEQ">Sequencial interno</option>
+        <option value="OFICIAL">Identificação oficial externa</option>
+      </select>
+    </div>
+
+    <div id="incSeqWrap" class="field hidden">
+      <label>ID – Sequencial interno</label>
+      <input id="incSeq" type="number" min="1" value="1">
+      <small>Usar quando não houver identificação oficial. Formato: 001, 002, 003...</small>
+    </div>
+
+    <div id="incOfficialWrap" class="field hidden">
+      <label>ID – Identificação oficial</label>
+      <input id="incOfficial" type="text" placeholder="Ex.: 12345/2026 ou 45.678">
+      <small>Pode ser matrícula, protocolo, registro, alvará etc. Pontos, barras e espaços serão removidos automaticamente.</small>
+    </div>
+
+    <!-- CORPORATIVO -->
+    <div id="docTipWrap" class="field hidden">
+      <label>TIP – Tipo Documental</label>
+      <select id="docTip">
+        <option value="PCO">PCO – Procedimento Operacional</option>
+        <option value="ITR">ITR – Instrução de Trabalho</option>
+        <option value="FOR">FOR – Formulário</option>
+        <option value="MTZ">MTZ – Matriz</option>
+        <option value="MAN">MAN – Manual</option>
+        <option value="POL">POL – Política</option>
+        <option value="MOD">MOD – Modelo</option>
+        <option value="REG">REG – Registro</option>
+      </select>
+    </div>
+
+    <div id="quaAssWrap" class="field hidden">
+      <label>ASS – Assunto / Processo</label>
+      <select id="quaAss">
+        <option value="GDO">GDO – Gestão Documental</option>
+        <option value="AUD">AUD – Auditoria</option>
+        <option value="NCO">NCO – Não Conformidade</option>
+        <option value="RIS">RIS – Riscos</option>
+      </select>
+    </div>
+
+    <div id="rhAssWrap" class="field hidden">
+      <label>ASS – Assunto / Processo</label>
+      <select id="rhAss">
+        <option value="ADM">ADM – Admissão</option>
+        <option value="TRE">TRE – Treinamento</option>
+        <option value="AVA">AVA – Avaliação</option>
+        <option value="DES">DES – Desligamento</option>
+        <option value="REC">REC – Recrutamento</option>
+      </select>
+    </div>
+
+    <div id="supAssWrap" class="field hidden">
+      <label>ASS – Assunto / Processo</label>
+      <select id="supAss">
+        <option value="COM">COM – Compras</option>
+        <option value="COT">COT – Cotação</option>
+        <option value="AVA">AVA – Avaliação</option>
+        <option value="HOM">HOM – Homologação de Fornecedores</option>
+      </select>
+    </div>
+
+    <div id="supEmpTipWrap" class="field hidden">
+      <label>TIP – Tipo Técnico</label>
+      <select id="supEmpTip">
+        <option value="COT">COT – Cotação</option>
+        <option value="MPC">MPC – Mapa de Cotação</option>
+        <option value="CTR">CTR – Contrato</option>
+      </select>
+    </div>
+
+    <div id="seqWrap" class="field hidden">
+      <label>SEQ – Número sequencial</label>
+      <input id="seq" type="number" min="1" value="1">
+      <small>Formato automático: 001, 002, 003...</small>
+    </div>
+
+    <div class="field">
+      <label>REV – Revisão</label>
+      <input id="rev" type="number" min="0" value="0">
+      <small>R00 = emissão inicial; R01, R02, R03... = revisões seguintes.</small>
+    </div>
+
+    <div class="field">
+      <label>Extensão</label>
+      <select id="ext"></select>
+    </div>
+
+  </div>
+
+  <div id="incHint" class="inc-note hidden">
+    <b>Dica para Incorporação:</b> use <b>Identificação oficial</b> sempre que o documento já possuir número oficial, como matrícula, protocolo, registro ou alvará. Use o sequencial interno apenas quando essa identificação não existir.
+  </div>
+</div>
+
+<div class="card">
+  <div class="title">3. Nome final <span class="badge">automático</span></div>
+  <div id="result" class="result"></div>
+  <button id="copy">Copiar nomenclatura</button>
+  <div id="explain" class="explain"></div>
+</div>
+
+<div class="note">
+  As opções desta versão foram montadas a partir das siglas com status <b>Ativo</b> na Matriz Mestra enviada.
+</div>
+
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const pad3=n=>String(Math.max(0,Number(n)||0)).padStart(3,'0');
+const pad2=n=>String(Math.max(0,Number(n)||0)).padStart(2,'0');
+
+const dynamic=[
+'empWrap','disWrap','fasWrap','projTipWrap','folModeWrap','folNumWrap',
+'engTipWrap','objWrap','incTipWrap','incIdModeWrap','incSeqWrap','incOfficialWrap',
+'docTipWrap','quaAssWrap','rhAssWrap','supAssWrap','supEmpTipWrap','seqWrap','incHint'
+];
+
+function show(id,on=true){$(id).classList.toggle('hidden',!on)}
+function hideAll(){dynamic.forEach(id=>show(id,false))}
+
+function setExt(list){
+  const cur=$('ext').value;
+  $('ext').innerHTML=list.map(x=>`<option value="${x}">${x}</option>`).join('');
+  if(list.includes(cur)) $('ext').value=cur;
+}
+
+function cleanOfficial(v){
+  return (v||'').toUpperCase().replace(/[\s./\\-]+/g,'').replace(/[^A-Z0-9]/g,'');
+}
+
+function configure(){
+  hideAll();
+  const area=$('area').value;
+  show('supModeWrap',area==='SUP');
+
+  if(area==='PRO'){
+    $('pattern').textContent='EMP-DIS-FAS-TIP-FOL-REV.ext';
+    show('empWrap');show('disWrap');show('fasWrap');show('projTipWrap');show('folModeWrap');
+    show('folNumWrap',$('folMode').value==='NUM');
+    setExt(['.pdf','.dwg','.pln','.rvt','.ifc','.docx']);
+  }
+
+  if(area==='ENG'){
+    $('pattern').textContent='EMP-ARE-TIP-OBJ-SEQ-REV.ext';
+    show('empWrap');show('engTipWrap');show('objWrap');show('seqWrap');
+    setExt(['.pdf','.xlsx','.docx','.dwg']);
+  }
+
+  if(area==='INC'){
+    $('pattern').textContent='ARE-TIP-ID-REV.ext';
+    show('incTipWrap');show('incIdModeWrap');show('incHint');
+    show('incSeqWrap',$('incIdMode').value==='SEQ');
+    show('incOfficialWrap',$('incIdMode').value==='OFICIAL');
+    setExt(['.pdf','.docx','.xlsx']);
+  }
+
+  if(area==='QUA'){
+    $('pattern').textContent='TIP-ARE-ASS-SEQ-REV.ext';
+    show('docTipWrap');show('quaAssWrap');show('seqWrap');
+    setExt(['.docx','.pdf','.xlsx']);
+  }
+
+  if(area==='RH'){
+    $('pattern').textContent='TIP-ARE-ASS-SEQ-REV.ext';
+    show('docTipWrap');show('rhAssWrap');show('seqWrap');
+    setExt(['.pdf','.docx','.xlsx']);
+  }
+
+  if(area==='SUP'){
+    if($('supMode').value==='NORM'){
+      $('pattern').textContent='TIP-ARE-ASS-SEQ-REV.ext';
+      show('docTipWrap');show('supAssWrap');show('seqWrap');
+      setExt(['.pdf','.docx','.xlsx']);
+    }else{
+      $('pattern').textContent='EMP-ARE-TIP-SEQ-REV.ext';
+      show('empWrap');show('supEmpTipWrap');show('seqWrap');
+      setExt(['.pdf','.xlsx','.docx']);
+    }
+  }
+}
+
+function generate(){
+  configure();
+
+  const area=$('area').value;
+  const seq=pad3($('seq').value);
+  const rev='R'+pad2($('rev').value);
+  const ext=$('ext').value;
+
+  let parts=[],info=[];
+
+  if(area==='PRO'){
+    const fol=$('folMode').value==='UNI'?'UNI':pad3($('folNum').value);
+    parts=[$('emp').value,$('dis').value,$('fas').value,$('projTip').value,fol,rev];
+    info=[
+      `${$('emp').value} = EMP / Empreendimento`,
+      `${$('dis').value} = DIS / Disciplina`,
+      `${$('fas').value} = FAS / Fase`,
+      `${$('projTip').value} = TIP / Tipo Técnico`,
+      `${fol} = FOL / Folha ou prancha`,
+      `${rev} = REV / Revisão`
+    ];
+  }
+
+  if(area==='ENG'){
+    parts=[$('emp').value,'ENG',$('engTip').value,$('obj').value,seq,rev];
+    info=[
+      `${$('emp').value} = EMP / Empreendimento`,
+      `ENG = ARE / Engenharia`,
+      `${$('engTip').value} = TIP / Tipo Técnico`,
+      `${$('obj').value} = OBJ / Objeto ou localização`,
+      `${seq} = SEQ / Número sequencial`,
+      `${rev} = REV / Revisão`
+    ];
+  }
+
+  if(area==='INC'){
+    const id = $('incIdMode').value==='SEQ'
+      ? pad3($('incSeq').value)
+      : cleanOfficial($('incOfficial').value) || 'IDENTIFICACAO';
+
+    parts=['INC',$('incTip').value,id,rev];
+    info=[
+      `INC = ARE / Incorporação`,
+      `${$('incTip').value} = TIP / Tipo de Incorporação`,
+      `${id} = ID / ${$('incIdMode').value==='SEQ'?'Sequencial interno':'Identificação oficial externa'}`,
+      `${rev} = REV / Revisão`
+    ];
+  }
+
+  if(area==='QUA'){
+    parts=[$('docTip').value,'QUA',$('quaAss').value,seq,rev];
+    info=[
+      `${$('docTip').value} = TIP / Tipo Documental`,
+      `QUA = ARE / Qualidade`,
+      `${$('quaAss').value} = ASS / Assunto ou Processo`,
+      `${seq} = SEQ / Número sequencial`,
+      `${rev} = REV / Revisão`
+    ];
+  }
+
+  if(area==='RH'){
+    parts=[$('docTip').value,'RH',$('rhAss').value,seq,rev];
+    info=[
+      `${$('docTip').value} = TIP / Tipo Documental`,
+      `RH = ARE / Recursos Humanos`,
+      `${$('rhAss').value} = ASS / Assunto ou Processo`,
+      `${seq} = SEQ / Número sequencial`,
+      `${rev} = REV / Revisão`
+    ];
+  }
+
+  if(area==='SUP'){
+    if($('supMode').value==='NORM'){
+      parts=[$('docTip').value,'SUP',$('supAss').value,seq,rev];
+      info=[
+        `${$('docTip').value} = TIP / Tipo Documental`,
+        `SUP = ARE / Suprimentos`,
+        `${$('supAss').value} = ASS / Assunto ou Processo`,
+        `${seq} = SEQ / Número sequencial`,
+        `${rev} = REV / Revisão`
+      ];
+    }else{
+      parts=[$('emp').value,'SUP',$('supEmpTip').value,seq,rev];
+      info=[
+        `${$('emp').value} = EMP / Empreendimento`,
+        `SUP = ARE / Suprimentos`,
+        `${$('supEmpTip').value} = TIP / Tipo Técnico`,
+        `${seq} = SEQ / Número sequencial`,
+        `${rev} = REV / Revisão`
+      ];
+    }
+  }
+
+  $('result').textContent=parts.join('-')+ext;
+  $('explain').innerHTML=info.map(x=>`<div>${x}</div>`).join('')+`<div>${ext} = Extensão do arquivo</div>`;
+}
+
+document.querySelectorAll('select,input').forEach(el=>{
+  el.addEventListener('change',generate);
+  el.addEventListener('input',generate);
+});
+
+$('copy').addEventListener('click',()=>{
+  navigator.clipboard.writeText($('result').textContent);
+  const old=$('copy').textContent;
+  $('copy').textContent='Copiado!';
+  setTimeout(()=>$('copy').textContent=old,1200);
+});
+
+generate();
+</script>
+</body>
+</html>
